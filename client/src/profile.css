@@ -1,0 +1,105 @@
+.profile {
+  position: relative;
+  display: block;
+}
+
+.profile-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+
+.profile-trigger:hover .profile-copy b,
+.profile-trigger:hover .profile-chevron {
+  color: #fff;
+}
+
+.profile-chevron {
+  flex: 0 0 auto;
+  color: #8c9ab8;
+  transition: transform 0.18s;
+}
+
+.profile-chevron-open {
+  transform: rotate(90deg);
+}
+
+.profile-popover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 30;
+  padding: 14px;
+  border: 1px solid #2a3a60;
+  border-radius: 11px;
+  background: #172444;
+  box-shadow: 0 12px 30px #050b1c66;
+}
+
+.profile-popover-name,
+.profile-popover-email {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-popover-name {
+  color: #fff;
+  font-size: 12px;
+}
+
+.profile-popover-email {
+  margin-top: 4px;
+  color: #9ba8c3;
+  font-size: 10px;
+}
+
+.profile-booking-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+  padding: 11px 0;
+  border-top: 1px solid #2a3a60;
+  border-bottom: 1px solid #2a3a60;
+  color: #c5cee0;
+  font-size: 11px;
+}
+
+.profile-booking-count b {
+  color: #fff;
+  font-size: 14px;
+}
+
+.profile-error {
+  margin: -5px 0 12px;
+  color: #ffb2a6;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.profile-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 0;
+  border-radius: 7px;
+  color: #ffb2a6;
+  background: transparent;
+  font-size: 11px;
+  text-align: left;
+}
+
+.profile-logout:hover {
+  background: #253251;
+}
