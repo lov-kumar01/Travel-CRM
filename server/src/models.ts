@@ -5,7 +5,8 @@ const owned = { ownerId: { type: Schema.Types.ObjectId, ref: "User", required: t
 const userSchema = new Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  passwordHash: { type: String, required: true }
+  passwordHash: { type: String, required: true },
+  role: { type: String, enum: ["admin", "agent"], default: "agent", index: true }
 }, { timestamps: true });
 
 const customerSchema = new Schema({
@@ -29,7 +30,7 @@ const leadSchema = new Schema({
   returnDate: { type: Date },
   travelers: { type: Number, min: 1, default: 2 },
   budget: { type: Number, min: 0, default: 0 },
-  status: { type: String, enum: ["New", "Contacted", "Qualified", "Itinerary Sent", "Quote Sent", "Negotiation", "Booked", "Lost"], default: "New" },
+  status: { type: String, enum: ["New", "Contacted", "Qualified", "Itinerary Sent", "Quote Sent", "Negotiation", "Payment Pending", "Booked", "Lost"], default: "New" },
   priority: { type: String, enum: ["Low", "Medium", "High"], default: "Medium" },
   score: { type: Number, min: 0, max: 100, default: 0 },
   notes: { type: String, default: "" },
@@ -49,14 +50,17 @@ const tripSchema = new Schema({
 
 const quoteSchema = new Schema({
   ...owned,
-  customerName: { type: String, required: true },
-  destination: { type: String, required: true },
-  amount: { type: Number, required: true, min: 0 },
+  title: { type: String, default: "Booking note", trim: true, maxlength: 160 },
+  customerName: { type: String, default: "" },
+  destination: { type: String, default: "" },
+  amount: { type: Number, default: 0, min: 0 },
   currency: { type: String, default: "INR" },
   status: { type: String, enum: ["Draft", "Sent", "Accepted", "Rejected", "Expired"], default: "Draft" },
   validUntil: { type: Date },
-  notes: { type: String, default: "" }
+  notes: { type: String, default: "", maxlength: 20000 },
+  expiresAt: { type: Date, default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
 }, { timestamps: true });
+quoteSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const taskSchema = new Schema({
   ...owned,
@@ -106,7 +110,7 @@ const passengerSchema = new Schema({
 
 const bookingSchema = new Schema({
   ...owned,
-  bookingReference: { type: String, required: true, trim: true },
+  bookingReference: { type: String, required: true, trim: true, uppercase: true, minlength: 4, maxlength: 20 },
   gdsConfirmation: { type: String, default: "" },
   customerName: { type: String, required: true, trim: true },
   customerEmail: { type: String, default: "" },
@@ -122,14 +126,25 @@ const bookingSchema = new Schema({
   seatSelections: { type: String, default: "" },
   baggage: { type: String, default: "" },
   baseFare: { type: Number, min: 0, default: 0 },
-  taxes: { type: Number, min: 0, default: 0 },
   airlineFees: { type: Number, min: 0, default: 0 },
-  serviceFee: { type: Number, min: 0, default: 0 },
   currency: { type: String, enum: ["USD", "INR", "EUR", "GBP"], default: "USD" },
-  commission: { type: Number, min: 0, default: 0 },
   markup: { type: Number, min: 0, default: 0 },
   status: { type: String, enum: ["Pending Verification", "Payment Pending", "Ticketed", "Cancelled", "Refund Pending", "Refunded", "Reissued"], default: "Pending Verification" },
   paymentStatus: { type: String, enum: ["Unpaid", "Checkout Created", "Paid", "Failed", "Refunded"], default: "Unpaid" },
+  paymentMethod: { type: String, enum: ["Credit card", "Debit card", "Bank transfer", ""], default: "" },
+  cardholderName: { type: String, default: "", maxlength: 120 },
+  cardLastFour: { type: String, default: "", match: /^[0-9]{0,4}$/ },
+  cardExpiryMonth: { type: String, default: "", maxlength: 2 },
+  cardExpiryYear: { type: String, default: "", maxlength: 4 },
+  bankAccountHolder: { type: String, default: "", maxlength: 120 },
+  bankName: { type: String, default: "", maxlength: 120 },
+  bankIfsc: { type: String, default: "", maxlength: 20 },
+  bankTransferReference: { type: String, default: "", maxlength: 80 },
+  billingAddress: { type: String, default: "", maxlength: 180 },
+  billingCity: { type: String, default: "", maxlength: 80 },
+  billingRegion: { type: String, default: "", maxlength: 80 },
+  billingPostalCode: { type: String, default: "", maxlength: 20 },
+  billingCountry: { type: String, default: "", maxlength: 80 },
   assignedAgentName: { type: String, default: "" },
   notes: { type: String, default: "" }
 }, { timestamps: true });
@@ -137,3 +152,12 @@ bookingSchema.index({ ownerId: 1, bookingReference: 1 }, { unique: true });
 
 export const Passenger = mongoose.model("Passenger", passengerSchema);
 export const Booking = mongoose.model("Booking", bookingSchema);
+
+const bookingLockSchema = new Schema({
+  resourceKey: { type: String, required: true, unique: true },
+  bookingId: { type: String, default: "" },
+  agentId: { type: String, required: true },
+  agentName: { type: String, required: true },
+  expiresAt: { type: Date, required: true, index: { expires: 0 } }
+}, { timestamps: true });
+export const BookingLock = mongoose.model("BookingLock", bookingLockSchema);
