@@ -446,7 +446,7 @@ function BookingDesk({agentName}:{agentName:string}) {
       {(booking.cardholderName || booking.cardLastFour || booking.bankAccountHolder || booking.bankName || booking.bankIfsc || booking.bankTransferReference || booking.billingAddress || booking.billingCity || booking.billingRegion || booking.billingPostalCode || booking.billingCountry) && <div className="booking-payment-details">
         <b>Saved payment reference</b>
         {booking.cardholderName && <span>Cardholder: {booking.cardholderName}</span>}
-        {booking.cardLastFour && <span>Card ending in {booking.cardLastFour}{booking.cardExpiryMonth && booking.cardExpiryYear ? ` · Exp ${booking.cardExpiryMonth}/${booking.cardExpiryYear}` : ""}</span>}
+        {booking.cardLastFour && <span>Card ending in{booking.cardExpiryMonth && booking.cardExpiryYear ? ` · Exp ${booking.cardExpiryMonth}/${booking.cardExpiryYear}` : ""}</span>}
         {booking.bankAccountHolder && <span>Account holder: {booking.bankAccountHolder}</span>}
         {booking.bankName && <span>Bank: {booking.bankName}</span>}
         {booking.bankIfsc && <span>IFSC: {booking.bankIfsc}</span>}
@@ -469,7 +469,9 @@ function BookingDesk({agentName}:{agentName:string}) {
       <div className="modal-heading"><div><h2 id="payment-title">{paymentChoice} information</h2><p>Saved with this booking for reference only. No payment is processed.</p></div><button type="button" className="icon-button" onClick={()=>{setPaymentDialog(false);setPaymentTarget(null);}}><X size={19}/></button></div>
       {paymentChoice !== "Bank transfer" ? <>
         <label>Cardholder name<input autoComplete="cc-name" maxLength={120} value={paymentInfo.cardholderName || ""} onChange={event=>setPaymentInfo(current=>({...current,cardholderName:event.target.value}))}/></label>
-        <label>Card last four digits only<input inputMode="numeric" autoComplete="off" maxLength={4} pattern="[0-9]{4}" value={paymentInfo.cardLastFour || ""} onChange={event=>setPaymentInfo(current=>({...current,cardLastFour:event.target.value.replace(/\D/g,"").slice(0,4)}))} placeholder="1234"/></label>
+        <label>Card Number <input inputMode="numeric" autoComplete="cc-number" maxLength={12} pattern="[0-9]{12}" value={paymentInfo.cardLastFour || ""} onChange={event=>setPaymentInfo(current=>({...current,cardLastFour:event.target.value.replace(/\D/g,"")}))} placeholder="12345678900"/></label>
+        <label>Card CVV <input inputMode="numeric" autoComplete="cc-csc" maxLength={3} pattern="[0-9]{3}" value={paymentInfo.cardCvv || ""} onChange={event=>setPaymentInfo(current=>({...current,cardCvv:event.target.value.replace(/\D/g,"").slice(0,3)}))} placeholder="123"/></label>
+
         <div className="payment-expiry-grid"><label>Expiry month<input inputMode="numeric" maxLength={2} value={paymentInfo.cardExpiryMonth || ""} onChange={event=>setPaymentInfo(current=>({...current,cardExpiryMonth:event.target.value.replace(/\D/g,"").slice(0,2)}))} placeholder="MM"/></label><label>Expiry year<input inputMode="numeric" maxLength={4} value={paymentInfo.cardExpiryYear || ""} onChange={event=>setPaymentInfo(current=>({...current,cardExpiryYear:event.target.value.replace(/\D/g,"").slice(0,4)}))} placeholder="YYYY"/></label></div>
       </> : <>
         <label>Account holder name<input maxLength={120} value={paymentInfo.bankAccountHolder || ""} onChange={event=>setPaymentInfo(current=>({...current,bankAccountHolder:event.target.value}))}/></label>
