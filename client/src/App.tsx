@@ -254,7 +254,46 @@ function Auth({ onAuth }: { onAuth: (token: string, user: AnyRecord) => void }) 
     try { const data = await api<{token:string;user:AnyRecord}>(`/auth/${mode}`, { method:"POST", body:JSON.stringify({name,email,password}) }); onAuth(data.token,data.user); }
     catch (err:any) { setError(err.message || "Could not authenticate"); } finally { setBusy(false); }
   }
-  return <div className="auth-layout"><div className="auth-visual"><div className="auth-brand"><div className="brand-icon"><Plane size={22}/></div><b>TravelCRM AI</b></div><div className="auth-hero"><span className="eyebrow"><Sparkles size={14}/> THE INTELLIGENT TRAVEL WORKSPACE</span><h1>Every journey starts with a better <em>conversation.</em></h1><p>One calm workspace for leads, itineraries, quotes, and the follow-ups that turn inquiries into unforgettable trips.</p><div className="auth-stat-row"><div><b>360°</b><small>Traveler visibility</small></div><div><b>1 place</b><small>Every next step</small></div><div><b>AI-ready</b><small>Sales intelligence</small></div></div></div><div className="auth-foot">Built for travel teams who care about the details.</div></div><div className="auth-form-side"><form className="auth-form" onSubmit={submit}><div className="form-mark"><Plane size={22}/></div><h2>{mode === "login" ? "Welcome back" : "Create your workspace"}</h2><p className="muted">{mode === "login" ? "Sign in to pick up where your travelers left off." : "Start organizing your travel business today."}</p>{mode === "register" && <label>Full name<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"/></label>}<label>Email address<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@agency.com"/></label><label>Password<input required minLength={8} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label>{error && <div className="error-box">{error}</div>}<button className="primary-button full-button" disabled={busy}>{busy ? "Please wait..." : mode === "login" ? "Sign in to workspace" : "Create account"}<ArrowUpRight size={16}/></button><div className="auth-switch">{mode === "login" ? "New to TravelCRM? " : "Already have an account? "}<button type="button" onClick={()=>setMode(mode === "login" ? "register":"login")}>{mode === "login" ? "Create account":"Sign in"}</button></div></form></div></div>;
+  return <div className="auth-layout">
+    <section className="auth-visual">
+      <div className="auth-brand"><div className="brand-icon"><Plane size={22}/></div><b>TravelCRM <span>AI</span></b></div>
+      <div className="auth-hero">
+        <span className="auth-kicker"><Sparkles size={14}/> YOUR TRAVEL BUSINESS, IN SYNC</span>
+        <h1>Make room for <em>more memorable journeys.</em></h1>
+        <p>Bring leads, traveler details, bookings, and follow-ups together in one clear workspace, so your team can focus on the people behind every trip.</p>
+        <div className="auth-route-card" aria-label="Sample flight route from New York to Paris">
+          <div className="auth-route-heading"><span>THE JOURNEY AT A GLANCE</span><span className="auth-route-status"><i/> READY FOR TAKEOFF</span></div>
+          <div className="auth-route">
+            <div><small>FROM</small><b>JFK</b><span>New York</span></div>
+            <div className="auth-route-line"><span/><Plane size={17}/><span/></div>
+            <div><small>TO</small><b>CDG</b><span>Paris</span></div>
+          </div>
+          <div className="auth-route-footer"><span>One connected workspace</span><span>Every detail in reach <ArrowUpRight size={13}/></span></div>
+        </div>
+        <div className="auth-benefits"><span><i/> Traveler profiles</span><span><i/> Flight bookings</span><span><i/> Timely follow-ups</span></div>
+      </div>
+      <div className="auth-foot">Thoughtful tools for the people who make travel happen.</div>
+      <div className="auth-flight" aria-hidden="true"><Plane size={24}/></div>
+    </section>
+    <section className="auth-form-side">
+      <form className="auth-form" onSubmit={submit}>
+        <div className="auth-form-top"><div className="form-mark"><Plane size={21}/></div><span>TRAVELCRM WORKSPACE</span></div>
+        <h2>{mode === "login" ? "Welcome back" : "Start your next chapter"}</h2>
+        <p className="muted">{mode === "login" ? "Sign in to pick up where your travelers left off." : "Create an account to bring your travel work together."}</p>
+        <div className="auth-mode-switch" role="group" aria-label="Choose sign-in or registration">
+          <button type="button" className={mode === "login" ? "selected" : ""} aria-pressed={mode === "login"} onClick={()=>{setMode("login");setError("");}}>Sign in</button>
+          <button type="button" className={mode === "register" ? "selected" : ""} aria-pressed={mode === "register"} onClick={()=>{setMode("register");setError("");}}>Create account</button>
+        </div>
+        {mode === "register" && <label>Full name<input required autoComplete="name" minLength={2} maxLength={80} value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"/></label>}
+        <label>Email address<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@agency.com"/></label>
+        <label>Password<input required minLength={8} type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label>
+        {error && <div className="error-box" role="alert">{error}</div>}
+        <button className="primary-button full-button" disabled={busy}>{busy ? "Please wait..." : mode === "login" ? "Sign in to workspace" : "Create account"}<ArrowUpRight size={16}/></button>
+        <div className="auth-switch">{mode === "login" ? "New to TravelCRM? " : "Already have an account? "}<button type="button" onClick={()=>{setMode(mode === "login" ? "register":"login");setError("");}}>{mode === "login" ? "Create account":"Sign in"}</button></div>
+        <div className="auth-form-trust"><span><i/> Private workspace</span><span>Built for travel teams</span></div>
+      </form>
+    </section>
+  </div>;
 }
 
 function Dashboard({ onNavigate }: { onNavigate: (path:string)=>void }) {
@@ -274,15 +313,15 @@ function Dashboard({ onNavigate }: { onNavigate: (path:string)=>void }) {
     <div className="welcome-row"><div><div className="eyebrow dark-eyebrow"><span className="live-dot"/> YOUR BUSINESS AT A GLANCE</div><h1>Good day, traveler-maker <span>✦</span></h1><p className="page-subtitle">Here's what's moving across your travel business today.</p></div><button className="primary-button" onClick={()=>onNavigate("/bookings?new=1")}><Plus size={17}/> New flight booking</button></div>
     {error && <div className="error-box">{error}. Check that the API and MongoDB are running.</div>}
     <div className="stat-grid">
-      <Stat icon={UserRoundSearch} label="Active leads" value={data?.leads ?? "—"} note="Across your pipeline" tone="violet"/>
-      <Stat icon={Users} label="Traveler profiles" value={data?.customers ?? "—"} note="Relationships in one place" tone="blue"/>
-      <Stat icon={MapPinned} label="Trips in planning" value={data?.trips ?? "—"} note="Travel experiences" tone="mint"/>
-      <Stat icon={CircleDollarSign} label="Quote pipeline" value={data ? money(data.quoteValue) : "—"} note={`${data?.openTasks ?? "—"} open follow-ups`} tone="amber"/>
+      <Stat icon={UserRoundSearch} label="Active leads" value={data ? Number(data.leads ?? 0) : null} note="Across your pipeline" tone="violet"/>
+      <Stat icon={Users} label="Traveler profiles" value={data ? Number(data.customers ?? 0) : null} note="Relationships in one place" tone="blue"/>
+      <Stat icon={MapPinned} label="Trips in planning" value={data ? Number(data.trips ?? 0) : null} note="Travel experiences" tone="mint"/>
+      <Stat icon={CircleDollarSign} label="Quote pipeline" value={data ? Number(data.quoteValue ?? 0) : null} format="currency" note={<><AnimatedNumber value={data ? Number(data.openTasks ?? 0) : null}/> open follow-ups</>} tone="amber"/>
     </div>
     <div className="dashboard-grid">
-      <section className="panel pipeline-panel"><div className="panel-heading"><div><h3>Lead pipeline</h3><p>See where every opportunity stands.</p></div><button className="text-button" onClick={()=>onNavigate("/leads")}>View all <ArrowUpRight size={14}/></button></div><div className="pipeline-bars">{["New","Contacted","Qualified","Itinerary Sent","Quote Sent","Negotiation","Booked","Lost"].map((status)=>{const found=pipeline.find((x:any)=>x.status===status); const count=found?.count||0; return <div className="pipeline-row" key={status}><span>{status}</span><div className="bar-track"><div className={`bar-fill ${status==="Booked"?"bar-green":status==="Lost"?"bar-gray":""}`} style={{width:`${Math.max(count?7:0,(count/max)*100)}%`}}/></div><b>{count}</b></div>})}</div><div className="pipeline-footer"><TrendingUp size={16}/><span>Keep momentum: follow up on every quote within 48 hours.</span></div></section>
+      <section className="panel pipeline-panel"><div className="panel-heading"><div><h3>Lead pipeline</h3><p>See where every opportunity stands.</p></div><button className="text-button" onClick={()=>onNavigate("/leads")}>View all <ArrowUpRight size={14}/></button></div><div className="pipeline-bars">{["New","Contacted","Qualified","Itinerary Sent","Quote Sent","Negotiation","Booked","Lost"].map((status)=>{const found=pipeline.find((x:any)=>x.status===status); const count=Number(found?.count ?? 0); return <div className="pipeline-row" key={status}><span>{status}</span><div className="bar-track"><div className={`bar-fill ${status==="Booked"?"bar-green":status==="Lost"?"bar-gray":""}`} style={{width:`${Math.max(count?7:0,(count/max)*100)}%`}}/></div><b><AnimatedNumber value={data ? count : null}/></b></div>})}</div><div className="pipeline-footer"><TrendingUp size={16}/><span>Keep momentum: follow up on every quote within 48 hours.</span></div></section>
       <section className="panel ai-panel"><div className="ai-panel-top"><div className="ai-symbol"><Sparkles size={19}/></div><span className="ai-pill">AI COPILOT</span></div><h3>Your next best actions</h3><p>Small, timely actions can make a big difference to conversion.</p><div className="recommendation"><div className="rec-number">01</div><div><b>Reconnect with warm leads</b><span>Review quote-stage leads and ask what would help them decide.</span></div></div><div className="recommendation"><div className="rec-number">02</div><div><b>Keep trip details current</b><span>Confirm traveler counts, dates, and supplier availability.</span></div></div><button className="ai-cta" onClick={()=>onNavigate("/assistant")}>Open AI Sales Copilot <ArrowUpRight size={15}/></button></section>
-      <section className="panel recent-bookings-panel"><div className="panel-heading"><div><h3>Flight bookings</h3><p>{data?.recentBookings?.length || 0} saved bookings · Select a card to view or edit all details.</p></div><button className="text-button" onClick={()=>onNavigate("/bookings")}>Manage bookings <ArrowUpRight size={14}/></button></div>{data?.recentBookings?.length ? <div className="overview-booking-grid">{data.recentBookings.map((booking:AnyRecord)=><article className="overview-booking-card" key={booking._id} role="button" tabIndex={0} onClick={()=>onNavigate(`/bookings?edit=${encodeURIComponent(booking._id)}`)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onNavigate(`/bookings?edit=${encodeURIComponent(booking._id)}`);}}}>
+      <section className="panel recent-bookings-panel"><div className="panel-heading"><div><h3>Flight bookings</h3><p><AnimatedNumber value={data ? data.recentBookings?.length ?? 0 : null}/> saved bookings · Select a card to view or edit all details.</p></div><button className="text-button" onClick={()=>onNavigate("/bookings")}>Manage bookings <ArrowUpRight size={14}/></button></div>{data?.recentBookings?.length ? <div className="overview-booking-grid">{data.recentBookings.map((booking:AnyRecord)=><article className="overview-booking-card" key={booking._id} role="button" tabIndex={0} onClick={()=>onNavigate(`/bookings?edit=${encodeURIComponent(booking._id)}`)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onNavigate(`/bookings?edit=${encodeURIComponent(booking._id)}`);}}}>
         <div className="overview-booking-top"><div><b>{booking.bookingReference}</b><small>Saved {dateTime(booking.createdAt)}</small></div><Status value={booking.status}/></div>
         <div className="overview-booking-route"><span>{booking.origin}</span><Plane size={15}/><span>{booking.destination}</span></div>
         <div className="overview-booking-info"><div><small>Passenger</small><b>{booking.customerName}</b></div><div><small>Flight</small><b>{booking.airline} {booking.flightNumber || ""}</b></div><div><small>Departure</small><b>{dateTime(booking.departureAt)}</b></div><div><small>Payment</small><b>{booking.paymentMethod || "Not selected"} · {booking.paymentStatus || "Unpaid"}</b></div></div>
@@ -292,7 +331,27 @@ function Dashboard({ onNavigate }: { onNavigate: (path:string)=>void }) {
     <div className="footer-note">TravelCRM AI <span>•</span> A more thoughtful way to manage every journey.</div>
   </div>;
 }
-function Stat({icon:Icon,label,value,note,tone}:{icon:any;label:string;value:any;note:string;tone:string}) { return <div className="stat-card"><div className={`stat-icon ${tone}`}><Icon size={19}/></div><span className="stat-label">{label}</span><b className="stat-value">{value}</b><small>{note}</small></div>; }
+function Stat({icon:Icon,label,value,note,tone,format="number"}:{icon:any;label:string;value:number|null;note:React.ReactNode;tone:string;format?:"number"|"currency"}) { return <div className="stat-card"><div className={`stat-icon ${tone}`}><Icon size={19}/></div><span className="stat-label">{label}</span><b className="stat-value"><AnimatedNumber value={value} format={format}/></b><small>{note}</small></div>; }
+function AnimatedNumber({value,format="number"}:{value:number|null;format?:"number"|"currency"}) {
+  const [displayValue,setDisplayValue]=useState(0);
+  useEffect(()=>{
+    if(value===null||!Number.isFinite(value))return;
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){setDisplayValue(value);return;}
+    let frame=0;
+    const duration=1000;
+    const start=performance.now();
+    setDisplayValue(0);
+    const tick=(now:number)=>{
+      const progress=Math.min((now-start)/duration,1);
+      setDisplayValue(Math.round(value*(1-Math.pow(1-progress,3))));
+      if(progress<1)frame=window.requestAnimationFrame(tick);
+    };
+    frame=window.requestAnimationFrame(tick);
+    return()=>window.cancelAnimationFrame(frame);
+  },[value]);
+  if(value===null||!Number.isFinite(value))return <>—</>;
+  return <span aria-live="off">{format==="currency"?money(displayValue):new Intl.NumberFormat("en-IN").format(displayValue)}</span>;
+}
 function Status({value}:{value:string}) { const cls=(value||"new").toLowerCase().replace(/ /g,"-"); return <span className={`status status-${cls}`}>{value}</span>; }
 
 const bookingFields = [
@@ -325,6 +384,14 @@ const paymentMethods = ["Credit card","Debit card","Bank transfer"];
 const paymentTotal = (booking:AnyRecord) => Number(booking.baseFare || 0) + Number(booking.airlineFees || 0) + Number(booking.markup || 0);
 const bookingMoney = (booking:AnyRecord) => new Intl.NumberFormat("en-IN",{style:"currency",currency:booking.currency || "INR",maximumFractionDigits:0}).format(paymentTotal(booking));
 const localDateTime = (value:string) => value ? new Date(value).toISOString().slice(0,16) : "";
+const paymentReferenceNote = "Enter the full card number if needed. Only its last four digits and expiry are saved; the full number and CVV are not stored.";
+const safePaymentInfo = (info:AnyRecord) => {
+  const { cardCvv: _cardCvv, ...safeInfo } = info;
+  const cardLastFour = String(safeInfo.cardLastFour || "").replace(/\D/g, "");
+  const cardCvv = String(safeInfo.cardCvv || "");
+  safeInfo.cardLastFour = cardLastFour.slice(-4);
+  return safeInfo;
+};
 
 function BookingDesk({agentName}:{agentName:string}) {
   const [items,setItems] = useState<AnyRecord[]>([]);
@@ -336,16 +403,33 @@ function BookingDesk({agentName}:{agentName:string}) {
   const [paymentTarget,setPaymentTarget] = useState<AnyRecord|null>(null);
   const [paymentChoice,setPaymentChoice] = useState("");
   const [paymentInfo,setPaymentInfo] = useState<AnyRecord>({});
+  const [cardNumberInput,setCardNumberInput] = useState("");
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState("");
+  const listRequest = useRef(0);
   const location = useLocation();
   const navigate = useNavigate();
 
-  async function load() {
-    try { setItems(await api(`/bookings?search=${encodeURIComponent(search)}`)); setError(""); }
-    catch (e) { setError(e instanceof Error ? e.message : "Could not load bookings."); }
+  useEffect(() => {
+    if (paymentDialog) setCardNumberInput(String(paymentInfo.cardLastFour || ""));
+  }, [paymentDialog]);
+
+  async function load(query=search) {
+    const requestId = ++listRequest.current;
+    try {
+      const bookings = await api<AnyRecord[]>(`/bookings?search=${encodeURIComponent(query)}`);
+      if (requestId === listRequest.current) {
+        setItems(bookings);
+        setError("");
+      }
+    } catch (e) {
+      if (requestId === listRequest.current) setError(e instanceof Error ? e.message : "Could not load bookings.");
+    }
   }
-  useEffect(() => { load(); }, [search]);
+  useEffect(() => {
+    void load();
+    return () => { listRequest.current++; };
+  }, [search]);
   useEffect(() => {
     if (new URLSearchParams(location.search).get("new") === "1") {
       setEditingId("");
@@ -373,7 +457,7 @@ function BookingDesk({agentName}:{agentName:string}) {
     setEditorOpen(true);
   }
   function startEdit(booking:AnyRecord) {
-    const initial = {...booking};
+    const initial = safePaymentInfo(booking);
     for (const key of ["departureAt","arrivalAt"]) initial[key] = localDateTime(booking[key] || "");
     setEditingId(booking._id);
     setForm(initial);
@@ -387,21 +471,50 @@ function BookingDesk({agentName}:{agentName:string}) {
     if (key === "paymentMethod" && value) {
       setPaymentChoice(value);
       setPaymentTarget(editingId ? form : null);
-      setPaymentInfo(form);
+      setPaymentInfo(safePaymentInfo(form));
       setPaymentDialog(true);
     }
   }
   async function persistBooking() {
+    const origin = String(form.origin || "").trim().toUpperCase();
+    const destination = String(form.destination || "").trim().toUpperCase();
+    const departureAt = form.departureAt ? new Date(form.departureAt) : null;
+    const arrivalAt = form.arrivalAt ? new Date(form.arrivalAt) : null;
+    if (String(form.bookingReference || "").trim().length < 4) {
+      setError("Booking reference must contain at least 4 characters.");
+      return;
+    }
+    if (String(form.customerName || "").trim().length < 2) {
+      setError("Passenger / customer name must contain at least 2 characters.");
+      return;
+    }
+    if (String(form.airline || "").trim().length < 2) {
+      setError("Airline must contain at least 2 characters.");
+      return;
+    }
+    if (origin && destination && origin === destination) {
+      setError("Origin and destination must be different airports.");
+      return;
+    }
+    if (arrivalAt && departureAt && arrivalAt < departureAt) {
+      setError("Arrival must be after departure.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       const saved = await api<AnyRecord>(editingId ? `/bookings/${editingId}` : "/bookings",{
         method:editingId ? "PATCH" : "POST",
-        body:JSON.stringify({...form,assignedAgentName:agentName})
+        body:JSON.stringify({...safePaymentInfo(form),assignedAgentName:agentName})
       });
+      setItems(current=>[saved,...current.filter(item=>item._id!==saved._id)]);
       setEditorOpen(false);
+      if (!editingId) {
+        setSearch("");
+      } else {
+        void load();
+      }
       setEditingId("");
-      await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save booking.");
     } finally { setBusy(false); }
@@ -413,11 +526,13 @@ function BookingDesk({agentName}:{agentName:string}) {
     try {
       if (paymentTarget) {
         await api<AnyRecord>(`/bookings/${paymentTarget._id}`,{
-          method:"PATCH",body:JSON.stringify({...paymentInfo,paymentMethod:paymentChoice})
+          method:"PATCH",body:JSON.stringify({...safePaymentInfo(paymentInfo),paymentMethod:paymentChoice})
         });
         await load();
       }
-      setForm(current=>({...current,...paymentInfo,paymentMethod:paymentChoice}));
+      const safeInfo = safePaymentInfo(paymentInfo);
+      setPaymentInfo(safeInfo);
+      setForm(current=>({...current,...safeInfo,paymentMethod:paymentChoice}));
       setPaymentDialog(false);
       setPaymentTarget(null);
     } catch (e) {
@@ -443,10 +558,11 @@ function BookingDesk({agentName}:{agentName:string}) {
         <div><small>Payment</small><b>{booking.paymentMethod || "Not selected"} · {booking.paymentStatus || "Unpaid"}</b></div>
         <div><small>Fare total</small><b>{bookingMoney(booking)}</b></div>
       </div>
-      {(booking.cardholderName || booking.cardLastFour || booking.bankAccountHolder || booking.bankName || booking.bankIfsc || booking.bankTransferReference || booking.billingAddress || booking.billingCity || booking.billingRegion || booking.billingPostalCode || booking.billingCountry) && <div className="booking-payment-details">
+      {(booking.cardholderName || booking.cardLastFour || booking.cardCvv || booking.bankAccountHolder || booking.bankName || booking.bankIfsc || booking.bankTransferReference || booking.billingAddress || booking.billingCity || booking.billingRegion || booking.billingPostalCode || booking.billingCountry) && <div className="booking-payment-details">
         <b>Saved payment reference</b>
         {booking.cardholderName && <span>Cardholder: {booking.cardholderName}</span>}
-        {booking.cardLastFour && <span>Card ending in{booking.cardExpiryMonth && booking.cardExpiryYear ? ` · Exp ${booking.cardExpiryMonth}/${booking.cardExpiryYear}` : ""}</span>}
+        {booking.cardCvv && <span>CVV: {booking.cardCvv}</span>}
+        {booking.cardLastFour && <span>Card ending in {booking.cardLastFour}{booking.cardExpiryMonth && booking.cardExpiryYear ? ` · Exp ${booking.cardExpiryMonth}/${booking.cardExpiryYear}` : ""}</span>}
         {booking.bankAccountHolder && <span>Account holder: {booking.bankAccountHolder}</span>}
         {booking.bankName && <span>Bank: {booking.bankName}</span>}
         {booking.bankIfsc && <span>IFSC: {booking.bankIfsc}</span>}
@@ -458,10 +574,10 @@ function BookingDesk({agentName}:{agentName:string}) {
     {editorOpen && <div className="modal-backdrop" onClick={()=>setEditorOpen(false)}><form className="modal-card booking-editor" onSubmit={event=>{event.preventDefault();persistBooking();}} onClick={event=>event.stopPropagation()}>
       <div className="modal-heading"><div><h2>{editingId ? `Edit booking ${form.bookingReference || ""}` : "Add flight booking"}</h2><p>Booking reference must be unique. Agent name is filled from your signed-in account.</p></div><button type="button" className="icon-button" onClick={()=>setEditorOpen(false)}><X size={19}/></button></div>
       <div className="form-grid">{bookingFields.map(field=><label key={field.key} className={field.type==="textarea"?"wide-field":""}>{field.label}{field.required?" *":""}
-        {field.key==="assignedAgentName" ? <input value={agentName} readOnly/> : field.type==="select" ? <select required={field.required} value={form[field.key] ?? field.options?.[0] ?? ""} onChange={event=>updateField(field.key,field.type,event.target.value)}>{field.options?.map(option=><option key={option} value={option}>{option || "Choose a method"}</option>)}</select> : field.type==="textarea" ? <textarea rows={3} value={form[field.key] || ""} onChange={event=>updateField(field.key,field.type,event.target.value)}/> : <input required={field.required} type={field.type || "text"} min={field.type==="number"?(field.key==="passengers"?1:0):undefined} max={field.key==="passengers"?9:undefined} minLength={field.key==="bookingReference"?4:field.key==="origin"||field.key==="destination"?3:undefined} maxLength={field.key==="bookingReference"?20:field.key==="origin"||field.key==="destination"?3:undefined} pattern={field.key==="bookingReference"?"[A-Za-z0-9-]+":field.key==="origin"||field.key==="destination"?"[A-Za-z]{3}":undefined} value={form[field.key] ?? ""} onChange={event=>updateField(field.key,field.type,event.target.value)}/>}
-        {field.key==="paymentMethod" && form.paymentMethod && <button type="button" className="payment-edit-button" onClick={()=>{setPaymentChoice(form.paymentMethod);setPaymentInfo(form);setPaymentTarget(editingId ? form : null);setPaymentDialog(true);}}>Edit saved payment details</button>}
+        {field.key==="assignedAgentName" ? <input value={agentName} readOnly/> : field.type==="select" ? <select required={field.required} value={form[field.key] ?? field.options?.[0] ?? ""} onChange={event=>updateField(field.key,field.type,event.target.value)}>{field.options?.map(option=><option key={option} value={option}>{option || "Choose a method"}</option>)}</select> : field.type==="textarea" ? <textarea rows={3} value={form[field.key] || ""} onChange={event=>updateField(field.key,field.type,event.target.value)}/> : <input required={field.required} type={field.type || "text"} min={field.type==="number"?(field.key==="passengers"?1:0):undefined} max={field.key==="passengers"?9:undefined} minLength={field.key==="bookingReference"?4:field.key==="customerName"||field.key==="airline"?2:field.key==="origin"||field.key==="destination"?3:undefined} maxLength={field.key==="bookingReference"?20:field.key==="origin"||field.key==="destination"?3:field.key==="customerName"?160:field.key==="airline"?100:undefined} pattern={field.key==="bookingReference"?"[A-Za-z0-9-]+":field.key==="origin"||field.key==="destination"?"[A-Za-z]{3}":undefined} value={form[field.key] ?? ""} onChange={event=>updateField(field.key,field.type,event.target.value)}/>}
+        {field.key==="paymentMethod" && form.paymentMethod && <button type="button" className="payment-edit-button" onClick={()=>{setPaymentChoice(form.paymentMethod);setPaymentInfo(safePaymentInfo(form));setPaymentTarget(editingId ? form : null);setPaymentDialog(true);}}>Edit saved payment details</button>}
       </label>)}</div>
-      <div className="secure-payment-note"><CreditCard size={15}/> This booking stores masked payment references only; no payment is processed and full card, CVV, or bank account numbers must not be entered.</div>
+      <div className="secure-payment-note"><CreditCard size={15}/>{paymentReferenceNote}</div>
       {error && <div className="error-box" role="alert">{error}</div>}
       <div className="modal-actions"><button type="button" className="secondary-button" onClick={()=>setEditorOpen(false)}>Cancel</button><button className="primary-button" disabled={busy}>{busy?"Saving...":"Save booking"}</button></div>
     </form></div>}
@@ -469,8 +585,8 @@ function BookingDesk({agentName}:{agentName:string}) {
       <div className="modal-heading"><div><h2 id="payment-title">{paymentChoice} information</h2><p>Saved with this booking for reference only. No payment is processed.</p></div><button type="button" className="icon-button" onClick={()=>{setPaymentDialog(false);setPaymentTarget(null);}}><X size={19}/></button></div>
       {paymentChoice !== "Bank transfer" ? <>
         <label>Cardholder name<input autoComplete="cc-name" maxLength={120} value={paymentInfo.cardholderName || ""} onChange={event=>setPaymentInfo(current=>({...current,cardholderName:event.target.value}))}/></label>
-        <label>Card Number <input inputMode="numeric" autoComplete="cc-number" maxLength={12} pattern="[0-9]{12}" value={paymentInfo.cardLastFour || ""} onChange={event=>setPaymentInfo(current=>({...current,cardLastFour:event.target.value.replace(/\D/g,"")}))} placeholder="12345678900"/></label>
-        <label>Card CVV <input inputMode="numeric" autoComplete="cc-csc" maxLength={3} pattern="[0-9]{3}" value={paymentInfo.cardCvv || ""} onChange={event=>setPaymentInfo(current=>({...current,cardCvv:event.target.value.replace(/\D/g,"").slice(0,3)}))} placeholder="123"/></label>
+        <label>Card Number <input inputMode="numeric" autoComplete="cc-number" maxLength={16} value={cardNumberInput} onChange={event=>{const number=event.target.value.replace(/\D/g,"").slice(0,16);setCardNumberInput(number);setPaymentInfo(current=>({...current,cardLastFour:number.slice(-4)}));}} placeholder="Enter card number"/></label>
+        <label>Card CVV <input inputMode="numeric" autoComplete="off" maxLength={3} pattern="[0-9]{0,3}" value={paymentInfo.cardCvv || ""} onChange={event=>setPaymentInfo(current=>({...current,cardCvv:event.target.value.replace(/\D/g,"").slice(0,3)}))} placeholder="123"/></label>
 
         <div className="payment-expiry-grid"><label>Expiry month<input inputMode="numeric" maxLength={2} value={paymentInfo.cardExpiryMonth || ""} onChange={event=>setPaymentInfo(current=>({...current,cardExpiryMonth:event.target.value.replace(/\D/g,"").slice(0,2)}))} placeholder="MM"/></label><label>Expiry year<input inputMode="numeric" maxLength={4} value={paymentInfo.cardExpiryYear || ""} onChange={event=>setPaymentInfo(current=>({...current,cardExpiryYear:event.target.value.replace(/\D/g,"").slice(0,4)}))} placeholder="YYYY"/></label></div>
       </> : <>
@@ -486,7 +602,7 @@ function BookingDesk({agentName}:{agentName:string}) {
         <label>Postal code<input autoComplete="billing postal-code" maxLength={20} value={paymentInfo.billingPostalCode || ""} onChange={event=>setPaymentInfo(current=>({...current,billingPostalCode:event.target.value}))}/></label>
         <label>Country<input autoComplete="billing country-name" maxLength={80} value={paymentInfo.billingCountry || ""} onChange={event=>setPaymentInfo(current=>({...current,billingCountry:event.target.value}))}/></label>
       </div>
-      <div className="secure-payment-note"><CreditCard size={15}/>Do not enter a full card number, CVV, or bank account number. This form stores only masked reference details and does not process a payment.</div>
+      <div className="secure-payment-note"><CreditCard size={15}/>{paymentReferenceNote}</div>
       {error && <div className="error-box" role="alert">{error}</div>}
       <div className="modal-actions"><button className="secondary-button" onClick={()=>{setPaymentDialog(false);setPaymentTarget(null);}}>Cancel</button><button className="primary-button" disabled={busy} onClick={confirmPayment}>{busy?"Saving...":"Save payment information"}</button></div>
     </div></div>}
