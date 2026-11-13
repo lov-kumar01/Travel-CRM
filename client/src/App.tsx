@@ -744,9 +744,9 @@ function ResourcePage({kind,title,subtitle}:{kind:string;title:string;subtitle:s
   const cfg=config[kind];
   useEffect(()=>{if(kind==="bookings"&&new URLSearchParams(location.search).get("new")==="1"){setForm({});setModal(true);navigate("/bookings",{replace:true});}},[kind,location.search,navigate]);
   function updateFormField(key:string,type:string|undefined,value:string){const uppercase=kind==="bookings"&&["bookingReference","flightNumber","origin","destination"].includes(key);setForm(current=>({...current,[key]:type==="number"?Number(value):uppercase?value.toUpperCase():value}));}
-  async function load(){try{setItems(await api(`/${kind}?search=${encodeURIComponent(search)}`));setError("");}catch(e:any){setError(e.message);}}
+  async function load(query=search){try{setItems(await api(`/${kind}?search=${encodeURIComponent(query)}`));setError("");}catch(e:any){setError(e.message);}}
   useEffect(()=>{load();},[kind,search]);
-  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");try{await api(`/${kind}`,{method:"POST",body:JSON.stringify(form)});setModal(false);setForm({});await load();}catch(e:any){setError(e.message);}finally{setBusy(false);}}
+  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");try{await api(`/${kind}`,{method:"POST",body:JSON.stringify(form)});setModal(false);setForm({});setSearch("");await load("");}catch(e:any){setError(e.message);}finally{setBusy(false);}}
   async function updateStatus(item:AnyRecord,key:string,value:string){try{await api(`/${kind}/${item._id}`,{method:"PATCH",body:JSON.stringify({[key]:value})});await load();}catch(e:any){setError(e.message);}}
   async function remove(item:AnyRecord){if(!confirm("Delete this record?"))return;try{await api(`/${kind}/${item._id}`,{method:"DELETE"});await load();}catch(e:any){setError(e.message);}}
   async function scoreLead(item:AnyRecord){try{const result=await api<AnyRecord>("/ai/lead-insights",{method:"POST",body:JSON.stringify(item)});await api(`/leads/${item._id}`,{method:"PATCH",body:JSON.stringify({score:result.score,priority:result.priority})});alert(`AI lead score: ${result.score}/100\nPriority: ${result.priority}\n\n${result.nextAction}\n\nReasons: ${result.reasons.join(", ")}`);await load();}catch(e:any){setError(e.message);}}
